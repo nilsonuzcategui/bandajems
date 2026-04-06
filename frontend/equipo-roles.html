@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Equipo - JEMS Band</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+      .purple-gradient {
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #3b0764 100%);
+      }
+      .glass-card {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(5px);
+        z-index: 50;
+        align-items: center;
+        justify-content: center;
+      }
+      .modal-content {
+        background: #1e1b4b;
+        border: 1px solid rgba(168, 85, 247, 0.4);
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+      }
+    </style>
+  </head>
+  <body class="purple-gradient min-h-screen text-slate-100 p-4">
+    <div id="modal-rol" class="modal-overlay">
+      <div class="modal-content w-full max-w-md p-6 rounded-2xl mx-4">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-xl font-bold text-purple-400">Nuevo Rol</h3>
+          <button class="close-modal text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
+        </div>
+        <form id="form-rol" class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Nombre de la Función</label>
+            <input
+              type="text"
+              id="input-nombre-rol"
+              name="nombre_rol"
+              required
+              class="w-full bg-black/20 border border-white/10 rounded-lg p-3 outline-none focus:ring-2 focus:ring-purple-500"
+              placeholder="Ej: Sonidista"
+            />
+          </div>
+          <button
+            type="submit"
+            id="btn-guardar-rol"
+            class="w-full bg-purple-600 hover:bg-purple-500 p-3 rounded-xl font-bold transition-all"
+          >
+            Guardar Rol
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div id="modal-miembro" class="modal-overlay">
+      <div class="modal-content w-full max-w-md p-6 rounded-2xl mx-4">
+        <div class="flex justify-between items-center mb-6">
+          <h3 id="titulo-modal-miembro" class="text-xl font-bold text-purple-400">Nuevo Miembro</h3>
+          <button class="close-modal text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
+        </div>
+        <form id="form-miembro" class="space-y-4">
+          <input type="hidden" id="m-id" value="" />
+          <input
+            type="text"
+            id="m-nombre"
+            placeholder="Nombre Completo"
+            class="w-full bg-black/20 border border-white/10 rounded-lg p-3 outline-none focus:ring-2 focus:ring-purple-500"
+            required
+          />
+          <input
+            type="text"
+            id="m-foto"
+            placeholder="URL Foto (Avatar)"
+            class="w-full bg-black/20 border border-white/10 rounded-lg p-3 outline-none focus:ring-2 focus:ring-purple-500"
+          />
+          <button
+            type="submit"
+            id="btn-guardar-miembro"
+            class="w-full bg-green-600 hover:bg-green-500 p-3 rounded-xl font-bold transition-all"
+          >
+            Guardar Cambios
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="max-w-6xl mx-auto">
+      <nav class="flex gap-8 border-b border-white/10 mb-8 overflow-x-auto">
+        <a href="admin.html" class="pb-4 px-2 font-bold text-slate-400">EVENTOS</a>
+        <a href="equipo-roles.html" class="pb-4 px-2 font-bold border-b-4 border-purple-500 text-purple-400"
+          >EQUIPO & ROLES</a
+        >
+        <a href="repertorio.html" class="pb-4 px-2 font-bold text-slate-400">REPERTORIO</a>
+      </nav>
+
+      <div class="flex justify-between items-center mb-8">
+        <h2 class="text-2xl font-bold border-l-4 border-purple-500 pl-3">Integrantes</h2>
+        <button
+          id="btn-abrir-miembro"
+          class="bg-green-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-green-500 transition-all"
+        >
+          + Nuevo Miembro
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4" id="lista-miembros"></div>
+
+      <div class="mt-12 bg-black/30 p-6 rounded-2xl border border-dashed border-white/10">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-purple-400 font-bold uppercase text-sm tracking-wider">Roles Disponibles</h3>
+          <button
+            id="btn-abrir-rol"
+            class="text-xs bg-purple-600/20 border border-purple-500/50 px-3 py-1 rounded-lg text-purple-300 font-bold hover:bg-purple-600/40 transition-all"
+          >
+            + AGREGAR ROL
+          </button>
+        </div>
+        <div class="flex flex-wrap gap-3" id="lista-roles"></div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        const rutaApi = "http://localhost/bandajems/backend/api/";
+
+        // --- 1. CARGA INICIAL DE DATOS ---
+        cargarRoles();
+        cargarMiembros();
+
+        function cargarRoles() {
+          $.ajax({
+            url: rutaApi + "get_roles.php", // Asegúrate de crear este archivo para listar
+            type: "GET",
+            success: function (response) {
+              $("#lista-roles").empty();
+              response.forEach((rol) => {
+                $("#lista-roles").append(`
+                                  <span class="bg-white/5 px-4 py-2 rounded-full text-xs border border-white/10 flex items-center gap-3 group hover:border-purple-500/50 transition-all">
+                                      ${rol.nombre_rol}
+                                      <i class="fas fa-times text-slate-500 hover:text-red-400 cursor-pointer remove-item" data-id="${rol.id}"></i>
+                                  </span>
+                              `);
+              });
+            },
+          });
+        }
+
+        // --- CARGAR MIEMBROS ---
+        function cargarMiembros() {
+          $.ajax({
+            url: rutaApi + "get_miembros.php",
+            type: "GET",
+            success: function (response) {
+              $("#lista-miembros").empty();
+              response.forEach((m) => {
+                $("#lista-miembros").append(`
+                              <div class="glass-card p-4 rounded-xl flex justify-between items-center hover:bg-white/5 transition-all">
+                                  <div class="flex items-center gap-3">
+                                      <img src="${m.foto_url}" class="w-10 h-10 rounded-full border border-purple-500 object-cover shadow-lg shadow-purple-500/20">
+                                      <span class="font-semibold">${m.nombre}</span>
+                                  </div>
+                                  <button class="text-slate-500 hover:text-white transition-colors edit-miembro" data-id="${m.id}">
+                                      <i class="fas fa-edit text-xs"></i>
+                                  </button>
+                              </div>
+                          `);
+              });
+            },
+          });
+        }
+
+        // --- 2. LÓGICA DE MODALES ---
+        $("#btn-abrir-rol").on("click", () => $("#modal-rol").css("display", "flex").hide().fadeIn(200));
+
+        // 1. Al dar click en el botón "Nuevo Miembro" (Limpiar el form)
+        $("#btn-abrir-miembro").on("click", function () {
+          $("#form-miembro")[0].reset();
+          $("#m-id").val("");
+          $("#titulo-modal-miembro").text("Nuevo Miembro");
+          $("#modal-miembro").css("display", "flex").hide().fadeIn(200);
+        });
+
+        $(".close-modal").on("click", () => $(".modal-overlay").fadeOut(200));
+        $(window).on("click", (e) => {
+          if ($(e.target).hasClass("modal-overlay")) $(".modal-overlay").fadeOut(200);
+        });
+
+        // --- 3. PETICIÓN GUARDAR ROL ---
+        $("#form-rol").on("submit", function (e) {
+          e.preventDefault();
+          const btn = $("#btn-guardar-rol");
+          const nombreRol = $("#input-nombre-rol").val();
+
+          btn.prop("disabled", true).text("Guardando...");
+
+          $.ajax({
+            url: rutaApi + "save_rol.php",
+            type: "POST",
+            data: { nombre_rol: nombreRol },
+            dataType: "json",
+            success: function (response) {
+              if (response.status === "success") {
+                $("#modal-rol").fadeOut(200);
+                $("#input-nombre-rol").val("");
+                cargarRoles(); // Recargamos la lista
+              }
+            },
+            error: function (xhr) {
+              alert("Error al guardar: " + xhr.responseJSON.message);
+            },
+            complete: function () {
+              btn.prop("disabled", false).text("Guardar Rol");
+            },
+          });
+        });
+
+        // --- 4. ELIMINAR ITEM (OPCIONAL) ---
+        $(document).on("click", ".remove-item", function () {
+          const id = $(this).data("id");
+          if (confirm("¿Seguro que deseas eliminar este rol?")) {
+            // Aquí iría tu api/delete_rol.php
+            $(this).parent().fadeOut();
+          }
+        });
+
+        // --- GUARDAR MIEMBRO ---
+        $("#form-miembro").on("submit", function (e) {
+          e.preventDefault();
+          const btn = $("#btn-guardar-miembro");
+          const datos = {
+            nombre: $("#m-nombre").val(),
+            foto_url: $("#m-foto").val(),
+          };
+
+          btn.prop("disabled", true).text("Registrando...");
+
+          $.ajax({
+            url: rutaApi + "save_miembro.php",
+            type: "POST",
+            data: datos,
+            dataType: "json",
+            success: function (response) {
+              if (response.status === "success") {
+                $("#modal-miembro").fadeOut(200);
+                $("#form-miembro")[0].reset();
+                cargarMiembros(); // Refrescar lista
+              }
+            },
+            error: function (xhr) {
+              alert("Error: " + (xhr.responseJSON ? xhr.responseJSON.message : "Error desconocido"));
+            },
+            complete: function () {
+              btn.prop("disabled", false).text("Registrar Miembro");
+            },
+          });
+        });
+
+        // 2. Al dar click en EDITAR (Cargar datos)
+        $(document).on("click", ".edit-miembro", function () {
+          const id = $(this).data("id");
+          // Aquí puedes hacer un AJAX para traer los datos del miembro o usarlos de la lista si los tienes
+          // Por ahora, buscaremos el nombre en la card actual para rapidez
+          const card = $(this).closest(".glass-card");
+          const nombreActual = card.find("span").text();
+          const fotoActual = card.find("img").attr("src");
+
+          $("#m-id").val(id);
+          $("#m-nombre").val(nombreActual);
+          $("#m-foto").val(fotoActual);
+          $("#titulo-modal-miembro").text("Editar Miembro");
+          $("#modal-miembro").css("display", "flex").hide().fadeIn(200);
+        });
+
+        // 3. Modificar el envío del formulario
+        $("#form-miembro").on("submit", function (e) {
+          e.preventDefault();
+          const id = $("#m-id").val();
+          const urlAccion = id === "" ? "save_miembro.php" : "update_miembro.php"; // Truco de la URL
+
+          const datos = {
+            id: id,
+            nombre: $("#m-nombre").val(),
+            foto_url: $("#m-foto").val(),
+          };
+
+          $.ajax({
+            url: rutaApi + urlAccion,
+            type: "POST",
+            data: datos,
+            success: function (response) {
+              $("#modal-miembro").fadeOut(200);
+              cargarMiembros(); // Recargar la lista
+            },
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

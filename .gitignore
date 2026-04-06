@@ -1,0 +1,7 @@
+# Ignorar configuración de BD
+backend/config/Database.php
+
+# Ignorar archivos temporales de editores
+.vscode/
+.idea/
+node_modules/
