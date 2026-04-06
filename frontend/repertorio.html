@@ -14,32 +14,233 @@
         backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.1);
       }
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(5px);
+        z-index: 50;
+        align-items: center;
+        justify-content: center;
+      }
+      .modal-content {
+        background: #1e1b4b;
+        border: 1px solid rgba(168, 85, 247, 0.4);
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+      }
     </style>
   </head>
   <body class="purple-gradient min-h-screen text-slate-100 p-4">
+    <div id="modal-cancion" class="modal-overlay">
+      <div class="modal-content w-full max-w-lg p-6 rounded-2xl mx-4">
+        <div class="flex justify-between items-center mb-6">
+          <h3 id="titulo-modal" class="text-xl font-bold text-purple-400">Nueva Canción</h3>
+          <button class="close-modal text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
+        </div>
+        <form id="form-cancion" class="space-y-4">
+          <input type="hidden" id="c-id" />
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Título</label>
+            <input
+              type="text"
+              id="c-titulo"
+              required
+              class="w-full bg-black/20 border border-white/10 rounded-lg p-3 outline-none focus:ring-2 focus:ring-purple-500"
+              placeholder="Ej: Way Maker"
+            />
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-red-400 uppercase mb-1"
+                ><i class="fab fa-youtube mr-1"></i> YouTube (URL)</label
+              >
+              <input
+                type="text"
+                id="c-youtube"
+                required
+                class="w-full bg-black/20 border border-white/10 rounded-lg p-3 outline-none focus:ring-2 focus:ring-red-500"
+              />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-green-400 uppercase mb-1"
+                ><i class="fab fa-spotify mr-1"></i> Spotify (URL)</label
+              >
+              <input
+                type="text"
+                id="c-spotify"
+                class="w-full bg-black/20 border border-white/10 rounded-lg p-3 outline-none focus:ring-2 focus:ring-green-500"
+              />
+            </div>
+          </div>
+          <button
+            type="submit"
+            id="btn-guardar-cancion"
+            class="w-full bg-purple-600 hover:bg-purple-500 p-3 rounded-xl font-bold transition-all"
+          >
+            Guardar en Repertorio
+          </button>
+        </form>
+      </div>
+    </div>
+
     <div class="max-w-6xl mx-auto">
       <nav class="flex gap-8 border-b border-white/10 mb-8 overflow-x-auto">
-        <a href="/frontend/admin.html" class="pb-4 px-2 font-bold text-slate-400">EVENTOS</a>
-        <a href="/frontend/equipo-roles.html" class="pb-4 px-2 font-bold text-slate-400">EQUIPO & ROLES</a>
-        <a href="/frontend/repertorio.html" class="pb-4 px-2 font-bold border-b-4 border-purple-500 text-purple-400"
+        <a href="admin.html" class="pb-4 px-2 font-bold text-slate-400">EVENTOS</a>
+        <a href="equipo-roles.html" class="pb-4 px-2 font-bold text-slate-400">EQUIPO & ROLES</a>
+        <a href="repertorio.html" class="pb-4 px-2 font-bold border-b-4 border-purple-500 text-purple-400"
           >REPERTORIO</a
         >
       </nav>
 
-      <div class="flex justify-between items-center mb-8">
+      <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
         <h2 class="text-2xl font-bold border-l-4 border-purple-500 pl-3">Repertorio</h2>
-        <button
-          id="btn-abrir-cancion"
-          class="bg-purple-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-purple-500 transition-all"
-        >
-          + Nueva Canción
-        </button>
+
+        <div class="flex w-full md:w-auto gap-2">
+          <div class="relative flex-1">
+            <i class="fas fa-search absolute left-3 top-3 text-slate-500"></i>
+            <input
+              type="text"
+              id="buscador-cancion"
+              class="w-full md:w-64 bg-white/5 border border-white/10 rounded-lg pl-10 pr-4 py-2 outline-none focus:ring-2 focus:ring-purple-500"
+              placeholder="Buscar canción..."
+            />
+          </div>
+          <button
+            id="btn-abrir-cancion"
+            class="bg-purple-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-purple-500 transition-all"
+          >
+            + Nueva
+          </button>
+        </div>
       </div>
 
-      <div class="glass-card rounded-2xl overflow-hidden p-8 text-center">
+      <div id="contenedor-canciones" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+
+      <div id="vacio-canciones" class="hidden glass-card rounded-2xl p-8 text-center">
         <i class="fas fa-music text-5xl text-slate-700 mb-4 block"></i>
-        <p class="text-slate-400 italic">Administra los enlaces de YouTube y Spotify para los ensayos.</p>
+        <p class="text-slate-400 italic">No se encontraron canciones.</p>
       </div>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        const rutaApi = "http://localhost/bandajems/backend/api/";
+
+        cargarCanciones();
+
+        // Buscador en tiempo real
+        $("#buscador-cancion").on("keyup", function () {
+          const valor = $(this).val().toLowerCase();
+          $(".cancion-card").filter(function () {
+            $(this).toggle($(this).text().toLowerCase().indexOf(valor) > -1);
+          });
+          verificarVacio();
+        });
+
+        function verificarVacio() {
+          if ($(".cancion-card:visible").length === 0) {
+            $("#vacio-canciones").removeClass("hidden");
+          } else {
+            $("#vacio-canciones").addClass("hidden");
+          }
+        }
+
+        function cargarCanciones() {
+          $.ajax({
+            url: rutaApi + "get_canciones.php",
+            type: "GET",
+            success: function (response) {
+              $("#contenedor-canciones").empty();
+              if (response.length === 0) {
+                $("#vacio-canciones").removeClass("hidden");
+                return;
+              }
+
+              $("#vacio-canciones").addClass("hidden");
+              response.forEach((c) => {
+                $("#contenedor-canciones").append(`
+        <div class="glass-card p-4 rounded-xl hover:bg-white/5 transition-all cancion-card flex flex-col justify-between">
+            <div class="flex justify-between items-start mb-3 gap-2">
+                <h4 class="font-bold text-lg text-purple-200 leading-tight break-words">
+                    ${c.titulo}
+                </h4>
+                <div class="flex gap-2 shrink-0">
+                    <button onclick="editarCancion(${c.id}, '${c.titulo}', '${c.url_youtube}', '${c.url_spotify}')" 
+                            class="text-slate-500 hover:text-purple-400 p-1">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="flex gap-4 border-t border-white/5 pt-3 mt-auto">
+                <a href="${c.url_youtube}" target="_blank" 
+                   class="flex-1 bg-red-600/20 text-red-500 py-2 rounded-lg text-center hover:bg-red-600/40 transition-all"
+                   title="Ver en YouTube">
+                    <i class="fab fa-youtube"></i>
+                </a>
+                ${
+                  c.url_spotify
+                    ? `
+                <a href="${c.url_spotify}" target="_blank" 
+                   class="flex-1 bg-green-600/20 text-green-500 py-2 rounded-lg text-center hover:bg-green-600/40 transition-all"
+                   title="Escuchar en Spotify">
+                    <i class="fab fa-spotify"></i>
+                </a>`
+                    : ""
+                }
+            </div>
+        </div>
+    `);
+              });
+            },
+          });
+        }
+
+        // Lógica Modales
+        $("#btn-abrir-cancion").on("click", function () {
+          $("#form-cancion")[0].reset();
+          $("#c-id").val("");
+          $("#titulo-modal").text("Nueva Canción");
+          $("#modal-cancion").css("display", "flex").hide().fadeIn(200);
+        });
+
+        $(".close-modal").on("click", () => $(".modal-overlay").fadeOut(200));
+
+        $("#form-cancion").on("submit", function (e) {
+          e.preventDefault();
+          const id = $("#c-id").val();
+          const action = id ? "update_cancion.php" : "save_cancion.php";
+
+          $.ajax({
+            url: rutaApi + action,
+            type: "POST",
+            data: {
+              id: id,
+              titulo: $("#c-titulo").val(),
+              url_youtube: $("#c-youtube").val(),
+              url_spotify: $("#c-spotify").val(),
+            },
+            success: function () {
+              $("#modal-cancion").fadeOut(200);
+              cargarCanciones();
+            },
+          });
+        });
+
+        window.editarCancion = function (id, titulo, yt, sp) {
+          $("#c-id").val(id);
+          $("#c-titulo").val(titulo);
+          $("#c-youtube").val(yt);
+          $("#c-spotify").val(sp);
+          $("#titulo-modal").text("Editar Canción");
+          $("#modal-cancion").css("display", "flex").hide().fadeIn(200);
+        };
+      });
+    </script>
   </body>
 </html>
