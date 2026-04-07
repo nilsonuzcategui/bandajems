@@ -25,7 +25,8 @@ $queryLineup = "SELECT m.nombre, m.foto_url, r.nombre_rol
                 FROM evento_lineup el
                 JOIN miembros m ON el.miembro_id = m.id
                 JOIN roles r ON el.rol_id = r.id
-                WHERE el.evento_id = ?";
+                WHERE el.evento_id = ?
+                ORDER BY el.rol_id ASC";
 $stmtL = $db->prepare($queryLineup);
 $stmtL->execute([$id]);
 $lineup = $stmtL->fetchAll(PDO::FETCH_ASSOC);
