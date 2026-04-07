@@ -249,8 +249,10 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
       $(document).ready(function () {
-        // const rutaApi = "http://localhost/bandajems/backend/api/";
-        const rutaApi = "https://api.micasajems.com/api/";
+        // Detección automática de entorno (Local vs Producción)
+        const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+        const rutaApi = isLocal ? "http://localhost/bandajems/backend/api/" : "https://api.micasajems.com/api/";
+        console.log(`🚀 Corriendo en modo: ${isLocal ? "Localhost" : "Producción"}`);
 
         let miembrosBase = [],
           rolesBase = [],
