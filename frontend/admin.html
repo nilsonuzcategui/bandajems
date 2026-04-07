@@ -2,7 +2,7 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <title>Eventos - JEMS Band</title>
+    <title>Admin Eventos - JEMS Band</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
@@ -14,67 +14,430 @@
         backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.1);
       }
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(5px);
+        z-index: 50;
+        align-items: center;
+        justify-content: center;
+      }
+      .modal-content {
+        background: #1e1b4b;
+        border: 1px solid rgba(168, 85, 247, 0.4);
+        max-height: 95vh;
+        overflow-y: auto;
+      }
+      ::-webkit-scrollbar {
+        width: 5px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #0f172a;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #7c3aed;
+        border-radius: 10px;
+      }
     </style>
   </head>
   <body class="purple-gradient min-h-screen text-slate-100 p-4">
+    <div id="modal-editar-evento" class="modal-overlay">
+      <div class="modal-content w-full max-w-3xl p-6 rounded-2xl mx-4 shadow-2xl">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-2xl font-bold text-purple-400">Editar Actividad JEMS</h3>
+          <button class="close-modal text-slate-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+        </div>
+
+        <form id="form-editar-evento" class="space-y-6">
+          <input type="hidden" id="edit-ev-id" />
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="text-xs font-bold text-slate-400 uppercase">Nombre del Evento</label>
+              <input
+                type="text"
+                id="edit-ev-nombre"
+                class="w-full bg-black/20 border border-white/10 rounded-lg p-3 outline-none focus:ring-2 focus:ring-purple-500"
+              />
+            </div>
+            <div>
+              <label class="text-xs font-bold text-slate-400 uppercase">Fecha</label>
+              <input
+                type="date"
+                id="edit-ev-fecha"
+                class="w-full bg-black/20 border border-white/10 rounded-lg p-3 outline-none focus:ring-2 focus:ring-purple-500"
+              />
+            </div>
+          </div>
+
+          <div class="bg-black/20 p-5 rounded-xl border border-white/5">
+            <h4 class="text-purple-300 font-bold text-sm mb-4 uppercase italic">Modificar Lineup</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="edit-contenedor-lineup"></div>
+          </div>
+
+          <div class="bg-red-900/10 border border-red-500/20 p-4 rounded-xl">
+            <h4 class="text-red-400 font-bold text-xs mb-3 uppercase tracking-widest">
+              <i class="fas fa-history mr-2"></i>Registrar Incidencia (Histórico)
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <select
+                id="edit-miembro-cambio"
+                class="md:col-span-1 bg-slate-800 border-none rounded-lg p-2 text-sm outline-none"
+              >
+                <option value="">¿Quién faltó?</option>
+              </select>
+              <textarea
+                id="edit-nota-historico"
+                rows="1"
+                placeholder="Razón del cambio..."
+                class="md:col-span-2 bg-black/40 border border-white/10 rounded-lg p-2 text-sm outline-none focus:ring-1 focus:ring-red-500"
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="flex gap-4">
+            <button type="button" class="close-modal flex-1 bg-slate-700 p-3 rounded-xl font-bold">Cancelar</button>
+            <button
+              type="submit"
+              class="flex-[2] bg-purple-600 hover:bg-purple-500 p-3 rounded-xl font-bold shadow-lg transition-all"
+            >
+              GUARDAR CAMBIOS
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <div class="max-w-6xl mx-auto">
       <nav class="flex gap-8 border-b border-white/10 mb-8 overflow-x-auto">
-        <a href="/frontend/admin.html" class="pb-4 px-2 font-bold border-b-4 border-purple-500 text-purple-400"
-          >EVENTOS</a
+        <a href="admin.html" class="pb-4 px-2 font-bold border-b-4 border-purple-500 text-purple-400 uppercase"
+          >Eventos</a
         >
-        <a href="/frontend/equipo-roles.html" class="pb-4 px-2 font-bold text-slate-400">EQUIPO & ROLES</a>
-        <a href="/frontend/repertorio.html" class="pb-4 px-2 font-bold text-slate-400">REPERTORIO</a>
+        <a
+          href="equipo-roles.html"
+          class="pb-4 px-2 font-bold text-slate-400 hover:text-purple-300 transition-colors uppercase"
+          >Equipo & Roles</a
+        >
+        <a
+          href="repertorio.html"
+          class="pb-4 px-2 font-bold text-slate-400 hover:text-purple-300 transition-colors uppercase"
+          >Repertorio</a
+        >
       </nav>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div class="lg:col-span-1 space-y-4">
-          <h2 class="text-xl font-bold text-purple-400 mb-4 border-l-4 border-purple-500 pl-3">Cronograma</h2>
-          <div id="lista-cronograma" class="space-y-4">
-            <div class="glass-card p-4 rounded-lg border-l-4 border-green-500">
-              <p class="text-xs text-green-400 font-bold uppercase">Hoy / Próximo</p>
-              <p class="font-bold text-lg">12 Abr - Jóvenes JEMS</p>
-            </div>
+          <h2 class="text-xl font-bold text-purple-400 mb-4 border-l-4 border-purple-500 pl-3 uppercase">Cronograma</h2>
+          <div id="lista-cronograma" class="space-y-4 text-sm">
+            <div class="animate-pulse glass-card p-4 rounded-lg">Cargando eventos...</div>
           </div>
         </div>
 
         <div class="lg:col-span-2 glass-card rounded-2xl p-6 shadow-2xl">
-          <h2 class="text-2xl font-bold mb-6 text-purple-400">
-            <i class="fas fa-calendar-plus mr-2"></i>Nueva Actividad
+          <h2 class="text-2xl font-bold mb-6 text-purple-400 flex items-center">
+            <i class="fas fa-calendar-plus mr-3"></i>Nueva Actividad JEMS
           </h2>
-          <form id="form-evento" class="space-y-6">
+          <form id="form-nuevo-evento" class="space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <input
                 type="text"
-                placeholder="Nombre"
+                id="ev-nombre"
+                placeholder="Nombre de la actividad"
+                required
                 class="w-full bg-white/5 border border-white/10 rounded-lg p-3 outline-none focus:ring-2 focus:ring-purple-500"
               />
               <input
                 type="date"
+                id="ev-fecha"
+                required
                 class="w-full bg-white/5 border border-white/10 rounded-lg p-3 outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
-            <div class="bg-black/20 p-4 rounded-xl space-y-4">
-              <h3 class="text-sm font-bold text-purple-300 uppercase italic border-b border-white/5 pb-2">
-                Asignación de Lineup
-              </h3>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <select class="w-full bg-slate-800 border-none rounded-lg p-3 text-sm outline-none">
-                  <option>Director...</option>
-                </select>
-                <select class="w-full bg-slate-800 border-none rounded-lg p-3 text-sm outline-none">
-                  <option>Pianista...</option>
-                </select>
-              </div>
+
+            <div class="bg-black/20 p-5 rounded-xl border border-white/5">
+              <h3 class="text-purple-300 font-bold text-sm mb-4 uppercase italic">Lineup Inicial</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="contenedor-lineup"></div>
             </div>
+
+            <div class="bg-black/20 p-5 rounded-xl border border-white/5">
+              <h3 class="text-purple-300 font-bold text-sm mb-4 uppercase italic">Setlist de Alabanza</h3>
+              <div class="flex gap-2 mb-4 relative">
+                <input
+                  type="text"
+                  id="search-song"
+                  list="listado-canciones"
+                  placeholder="Buscar canción..."
+                  class="flex-1 bg-white/5 border border-white/10 rounded-lg p-2 text-sm outline-none"
+                  autocomplete="off"
+                />
+                <datalist id="listado-canciones"></datalist>
+                <button
+                  type="button"
+                  id="btn-add-song"
+                  class="bg-purple-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-purple-500"
+                >
+                  AGREGAR
+                </button>
+              </div>
+              <ul id="lista-setlist-nuevo" class="space-y-2"></ul>
+            </div>
+
             <button
               type="submit"
               class="w-full bg-purple-600 hover:bg-purple-500 p-4 rounded-xl font-bold uppercase tracking-widest transition-all"
             >
-              Publicar Actividad
+              Publicar en el Calendario
             </button>
           </form>
         </div>
       </div>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        const rutaApi = "http://localhost/bandajems/backend/api/";
+
+        // Estado Global
+        let miembrosBase = [];
+        let rolesBase = [];
+        let cancionesDB = [];
+        let setlistTemporal = [];
+
+        // 1. CARGA INICIAL
+        cargarCronograma();
+        cargarDatosMaestros();
+        cargarDatalistCanciones();
+
+        function cargarCronograma() {
+          $.get(rutaApi + "get_cronograma.php", function (data) {
+            $("#lista-cronograma").empty();
+            if (!data || data.length === 0) {
+              $("#lista-cronograma").append(
+                '<p class="text-slate-500 italic text-center p-4">No hay actividades registradas.</p>',
+              );
+              return;
+            }
+            data.forEach((ev) => {
+              const hoy = new Date().toISOString().split("T")[0];
+              let border = "border-purple-500";
+              let badge = "";
+              let opacity = "opacity-100";
+
+              if (ev.fecha < hoy) {
+                opacity = "opacity-50";
+                border = "border-slate-600";
+              }
+              if (ev.fecha === hoy) {
+                border = "border-green-500 ring-2 ring-green-500/20";
+                badge = "<span class='text-[10px] text-green-400 font-bold block tracking-widest'>HOY</span>";
+              }
+
+              $("#lista-cronograma").append(`
+                        <div class="glass-card p-4 rounded-lg border-l-4 ${border} ${opacity} flex justify-between items-center group transition-all hover:bg-white/5">
+                            <div>
+                                ${badge}
+                                <p class="font-bold text-slate-200">${ev.nombre_evento}</p>
+                                <p class="text-[10px] text-slate-500 uppercase italic font-medium">${ev.fecha}</p>
+                            </div>
+                            <button onclick="abrirEditor(${ev.id}, '${ev.nombre_evento}', '${ev.fecha}')" class="opacity-0 group-hover:opacity-100 transition-opacity text-purple-400 hover:text-white p-2">
+                                <i class="fas fa-edit text-lg"></i>
+                            </button>
+                        </div>
+                    `);
+            });
+          });
+        }
+
+        function cargarDatosMaestros() {
+          $.get(rutaApi + "get_roles.php", function (roles) {
+            rolesBase = roles;
+            $.get(rutaApi + "get_miembros.php", function (miembros) {
+              miembrosBase = miembros;
+
+              // Generar selects para Nuevo Evento y Modal de Edición
+              const htmlSelects = rolesBase
+                .map(
+                  (rol) => `
+                        <div class="flex flex-col">
+                            <label class="text-[10px] text-slate-400 uppercase font-bold mb-1">${rol.nombre_rol}</label>
+                            <select name="rol_${rol.id}" class="select-lineup w-full bg-slate-800 border-none rounded-lg p-2 text-sm text-slate-300 focus:ring-1 focus:ring-purple-500">
+                                <option value="">-- Vacante --</option>
+                                ${miembrosBase.map((m) => `<option value="${m.id}">${m.nombre}</option>`).join("")}
+                            </select>
+                        </div>
+                    `,
+                )
+                .join("");
+
+              $("#contenedor-lineup").html(htmlSelects);
+              $("#edit-contenedor-lineup").html(htmlSelects);
+
+              // Llenar select de reporte de inasistencia (Histórico)
+              $("#edit-miembro-cambio").empty().append('<option value="">¿Quién faltó?</option>');
+              miembrosBase.forEach((m) =>
+                $("#edit-miembro-cambio").append(`<option value="${m.id}">${m.nombre}</option>`),
+              );
+            });
+          });
+        }
+
+        function cargarDatalistCanciones() {
+          $.get(rutaApi + "get_canciones.php", function (data) {
+            cancionesDB = data;
+            $("#listado-canciones")
+              .empty()
+              .append(data.map((c) => `<option value="${c.titulo}">`));
+          });
+        }
+
+        // 2. BUSCADOR DE CANCIONES (SETLIST)
+        $("#btn-add-song").on("click", function () {
+          const val = $("#search-song").val().trim();
+          if (val === "") return;
+
+          const found = cancionesDB.find((c) => c.titulo.toLowerCase() === val.toLowerCase());
+          if (found) {
+            if (!setlistTemporal.find((s) => s.id === found.id)) {
+              setlistTemporal.push({ id: found.id, titulo: found.titulo });
+              renderSetlist();
+            }
+          } else {
+            if (confirm("La canción no está en el repertorio. ¿Agregar de todos modos?")) {
+              setlistTemporal.push({ id: null, titulo: val });
+              renderSetlist();
+            }
+          }
+          $("#search-song").val("").focus();
+        });
+
+        function renderSetlist() {
+          $("#lista-setlist-nuevo")
+            .empty()
+            .append(
+              setlistTemporal
+                .map(
+                  (s, i) => `
+                <li class="flex justify-between items-center bg-white/5 p-2 rounded-lg text-sm border border-white/10">
+                    <span><b class="text-purple-500 mr-2">${i + 1}.</b> ${s.titulo}</span>
+                    <button type="button" onclick="quitarCancion('${s.id}', '${s.titulo}')" class="text-red-400 hover:text-red-300 transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </li>
+            `,
+                )
+                .join(""),
+            );
+        }
+
+        window.quitarCancion = function (id, tit) {
+          setlistTemporal = setlistTemporal.filter((s) => (id !== "null" ? s.id != id : s.titulo !== tit));
+          renderSetlist();
+        };
+
+        // 3. LÓGICA DE EDICIÓN (PRECARGA DE DATOS)
+        window.abrirEditor = function (id, nom, fec) {
+          // Limpiar campos previos
+          $("#modal-editar-evento select.select-lineup").val("");
+          $("#edit-nota-historico").val("");
+          $("#edit-miembro-cambio").val("");
+
+          // Cargar datos básicos
+          $("#edit-ev-id").val(id);
+          $("#edit-ev-nombre").val(nom);
+          $("#edit-ev-fecha").val(fec);
+
+          // AJAX para traer el lineup actual del evento y autoseleccionar
+          $.get(rutaApi + "get_lineup_evento.php", { evento_id: id }, function (lineupActual) {
+            if (lineupActual && lineupActual.length > 0) {
+              lineupActual.forEach((asig) => {
+                $(`#edit-contenedor-lineup select[name="rol_${asig.rol_id}"]`).val(asig.miembro_id);
+              });
+            }
+            $("#modal-editar-evento").css("display", "flex").hide().fadeIn(200);
+          });
+        };
+
+        $(".close-modal").on("click", () => $(".modal-overlay").fadeOut(200));
+
+        // 4. SUBMITS (NUEVO / EDITAR)
+        $("#form-editar-evento").on("submit", function (e) {
+          e.preventDefault();
+          const btn = $(this).find('button[type="submit"]');
+          btn.prop("disabled", true).text("Guardando...");
+
+          let lineupEditado = [];
+          $("#edit-contenedor-lineup .select-lineup").each(function () {
+            if ($(this).val()) {
+              lineupEditado.push({
+                miembro_id: $(this).val(),
+                rol_id: $(this).attr("name").replace("rol_", ""),
+              });
+            }
+          });
+
+          // Armamos el objeto exactamente como lo espera el backend
+          const payload = {
+            evento_id: $("#edit-ev-id").val(),
+            nombre: $("#edit-ev-nombre").val(),
+            fecha: $("#edit-ev-fecha").val(),
+            miembro_afectado: $("#edit-miembro-cambio").val(),
+            nota: $("#edit-nota-historico").val(),
+            lineup: lineupEditado,
+          };
+
+          $.ajax({
+            url: rutaApi + "update_evento_completo.php",
+            type: "POST",
+            contentType: "application/json", // IMPORTANTE: Enviamos JSON
+            data: JSON.stringify(payload), // Convertimos el objeto a string
+            success: function (res) {
+              $("#modal-editar-evento").fadeOut(200);
+              cargarCronograma();
+              alert("¡Actualizado con éxito!");
+            },
+            error: function (xhr) {
+              console.error(xhr.responseText);
+              alert("Error al actualizar.");
+            },
+            complete: () => btn.prop("disabled", false).text("ACTUALIZAR EVENTO Y LOG"),
+          });
+        });
+
+        $("#form-nuevo-evento").on("submit", function (e) {
+          e.preventDefault();
+          let lineup = [];
+          $("#contenedor-lineup .select-lineup").each(function () {
+            if ($(this).val())
+              lineup.push({ miembro_id: $(this).val(), rol_id: $(this).attr("name").replace("rol_", "") });
+          });
+
+          if (lineup.length === 0) return alert("Asigna al menos un músico.");
+
+          const payload = {
+            nombre: $("#ev-nombre").val(),
+            fecha: $("#ev-fecha").val(),
+            lineup: lineup,
+            setlist: setlistTemporal,
+          };
+
+          $.ajax({
+            url: rutaApi + "save_evento_completo.php",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(payload),
+            success: function () {
+              alert("¡Publicado!");
+              location.reload();
+            },
+          });
+        });
+      });
+    </script>
   </body>
 </html>
