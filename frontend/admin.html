@@ -5,32 +5,9 @@
     <title>Admin Eventos - JEMS Band</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-
     <link rel="icon" type="image/png" href="https://banda.micasajems.com/images/logobandajems.png" />
     <link rel="apple-touch-icon" href="https://banda.micasajems.com/images/logobandajems.png" />
-
-    <meta name="description" content="Control de eventos, lineup y setlist oficial de la Banda JEMS." />
-    <meta name="author" content="Nilson Uzcátegui" />
-
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://banda.micasajems.com/" />
-    <meta property="og:title" content="JEMS Band - Control de Eventos" />
-    <meta
-      property="og:description"
-      content="Consulta el próximo evento, los músicos asignados y el setlist de alabanza de la Banda JEMS."
-    />
-    <meta property="og:image" content="https://banda.micasajems.com/images/logobandajems.png" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:url" content="https://banda.micasajems.com/" />
-    <meta name="twitter:title" content="JEMS Band - Control de Eventos" />
-    <meta name="twitter:description" content="Consulta el próximo evento y lineup oficial de la Banda JEMS." />
-    <meta name="twitter:image" content="https://banda.micasajems.com/images/logobandajems.png" />
-
     <meta name="theme-color" content="#1e1b4b" />
-
     <style>
       .purple-gradient {
         background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #3b0764 100%);
@@ -78,34 +55,24 @@
           <h3 class="text-2xl font-bold text-purple-400">Editar Actividad JEMS</h3>
           <button class="close-modal text-slate-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
         </div>
-
         <form id="form-editar-evento" class="space-y-6">
           <input type="hidden" id="edit-ev-id" />
-
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="text-xs font-bold text-slate-400 uppercase">Nombre del Evento</label>
-              <input
-                type="text"
-                id="edit-ev-nombre"
-                class="w-full bg-black/20 border border-white/10 rounded-lg p-3 outline-none focus:ring-2 focus:ring-purple-500"
-              />
-            </div>
-            <div>
-              <label class="text-xs font-bold text-slate-400 uppercase">Fecha</label>
-              <input
-                type="date"
-                id="edit-ev-fecha"
-                class="w-full bg-black/20 border border-white/10 rounded-lg p-3 outline-none focus:ring-2 focus:ring-purple-500"
-              />
-            </div>
+            <input
+              type="text"
+              id="edit-ev-nombre"
+              class="w-full bg-black/20 border border-white/10 rounded-lg p-3 outline-none focus:ring-2 focus:ring-purple-500"
+            />
+            <input
+              type="date"
+              id="edit-ev-fecha"
+              class="w-full bg-black/20 border border-white/10 rounded-lg p-3 outline-none focus:ring-2 focus:ring-purple-500"
+            />
           </div>
-
           <div class="bg-black/20 p-5 rounded-xl border border-white/5">
             <h4 class="text-purple-300 font-bold text-sm mb-4 uppercase italic">Modificar Lineup</h4>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="edit-contenedor-lineup"></div>
           </div>
-
           <div class="bg-black/20 p-5 rounded-xl border border-white/5">
             <h4 class="text-purple-300 font-bold text-sm mb-4 uppercase italic">Modificar Setlist</h4>
             <div class="flex gap-2 mb-4 relative">
@@ -117,37 +84,25 @@
                 class="flex-1 bg-white/5 border border-white/10 rounded-lg p-2 text-sm outline-none"
                 autocomplete="off"
               />
-              <button
-                type="button"
-                id="edit-btn-add-song"
-                class="bg-purple-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-purple-500"
-              >
+              <button type="button" id="edit-btn-add-song" class="bg-purple-600 px-4 py-2 rounded-lg text-xs font-bold">
                 AGREGAR
               </button>
             </div>
             <ul id="edit-lista-setlist" class="space-y-2"></ul>
           </div>
-
           <div class="bg-red-900/10 border border-red-500/20 p-4 rounded-xl">
-            <h4 class="text-red-400 font-bold text-xs mb-3 uppercase tracking-widest">
-              <i class="fas fa-history mr-2"></i>Registrar Incidencia (Histórico)
-            </h4>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <select
-                id="edit-miembro-cambio"
-                class="md:col-span-1 bg-slate-800 border-none rounded-lg p-2 text-sm outline-none"
-              >
+              <select id="edit-miembro-cambio" class="bg-slate-800 border-none rounded-lg p-2 text-sm outline-none">
                 <option value="">¿Quién faltó?</option>
               </select>
               <textarea
                 id="edit-nota-historico"
                 rows="1"
                 placeholder="Razón del cambio..."
-                class="md:col-span-2 bg-black/40 border border-white/10 rounded-lg p-2 text-sm outline-none focus:ring-1 focus:ring-red-500"
+                class="md:col-span-2 bg-black/40 border border-white/10 rounded-lg p-2 text-sm outline-none"
               ></textarea>
             </div>
           </div>
-
           <div class="flex gap-4">
             <button type="button" class="close-modal flex-1 bg-slate-700 p-3 rounded-xl font-bold">Cancelar</button>
             <button
@@ -169,7 +124,7 @@
         <a
           href="equipo-roles.html"
           class="pb-4 px-2 font-bold text-slate-400 hover:text-purple-300 transition-colors uppercase"
-          >Equipo & Roles</a
+          >Equipo</a
         >
         <a
           href="repertorio.html"
@@ -181,9 +136,7 @@
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div class="lg:col-span-1 space-y-4">
           <h2 class="text-xl font-bold text-purple-400 mb-4 border-l-4 border-purple-500 pl-3 uppercase">Cronograma</h2>
-          <div id="lista-cronograma" class="space-y-4 text-sm">
-            <div class="animate-pulse glass-card p-4 rounded-lg">Cargando eventos...</div>
-          </div>
+          <div id="lista-cronograma" class="space-y-4 text-sm"></div>
         </div>
 
         <div class="lg:col-span-2 glass-card rounded-2xl p-6 shadow-2xl">
@@ -206,14 +159,12 @@
                 class="w-full bg-white/5 border border-white/10 rounded-lg p-3 outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
-
             <div class="bg-black/20 p-5 rounded-xl border border-white/5">
               <h3 class="text-purple-300 font-bold text-sm mb-4 uppercase italic">Lineup Inicial</h3>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="contenedor-lineup"></div>
             </div>
-
             <div class="bg-black/20 p-5 rounded-xl border border-white/5">
-              <h3 class="text-purple-300 font-bold text-sm mb-4 uppercase italic">Setlist de Alabanza</h3>
+              <h3 class="text-purple-300 font-bold text-sm mb-4 uppercase italic">Setlist</h3>
               <div class="flex gap-2 mb-4 relative">
                 <input
                   type="text"
@@ -221,25 +172,19 @@
                   list="listado-canciones"
                   placeholder="Buscar canción..."
                   class="flex-1 bg-white/5 border border-white/10 rounded-lg p-2 text-sm outline-none"
-                  autocomplete="off"
                 />
                 <datalist id="listado-canciones"></datalist>
-                <button
-                  type="button"
-                  id="btn-add-song"
-                  class="bg-purple-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-purple-500"
-                >
+                <button type="button" id="btn-add-song" class="bg-purple-600 px-4 py-2 rounded-lg text-xs font-bold">
                   AGREGAR
                 </button>
               </div>
               <ul id="lista-setlist-nuevo" class="space-y-2"></ul>
             </div>
-
             <button
               type="submit"
               class="w-full bg-purple-600 hover:bg-purple-500 p-4 rounded-xl font-bold uppercase tracking-widest transition-all"
             >
-              Publicar en el Calendario
+              Publicar
             </button>
           </form>
         </div>
@@ -249,16 +194,14 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
       $(document).ready(function () {
-        // Detección automática de entorno (Local vs Producción)
         const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
         const rutaApi = isLocal ? "http://localhost/bandajems/backend/api/" : "https://api.micasajems.com/api/";
-        console.log(`🚀 Corriendo en modo: ${isLocal ? "Localhost" : "Producción"}`);
 
         let miembrosBase = [],
           rolesBase = [],
-          cancionesDB = [];
-        let setlistTemporal = []; // Para Nuevo Evento
-        let setlistEdit = []; // Para Edición de Evento
+          cancionesDB = [],
+          setlistTemporal = [],
+          setlistEdit = [];
 
         cargarCronograma();
         cargarDatosMaestros();
@@ -267,33 +210,20 @@
         function cargarCronograma() {
           $.get(rutaApi + "get_cronograma.php", function (data) {
             $("#lista-cronograma").empty();
-            if (!data || data.length === 0) {
-              $("#lista-cronograma").append(
-                '<p class="text-slate-500 italic text-center p-4">No hay actividades registradas.</p>',
-              );
-              return;
-            }
+            if (!data) return;
             data.forEach((ev) => {
               const hoy = new Date().toISOString().split("T")[0];
               let border =
                 ev.fecha < hoy
                   ? "border-slate-600"
                   : ev.fecha === hoy
-                    ? "border-green-500 ring-2 ring-green-500/20"
+                    ? "border-green-500 ring-2"
                     : "border-purple-500";
-              let badge =
-                ev.fecha === hoy
-                  ? "<span class='text-[10px] text-green-400 font-bold block tracking-widest'>HOY</span>"
-                  : "";
-
               $("#lista-cronograma").append(`
-                <div class="glass-card p-4 rounded-lg border-l-4 ${border} ${ev.fecha < hoy ? "opacity-50" : ""} flex justify-between items-center group transition-all hover:bg-white/5">
-                    <div>${badge}<p class="font-bold text-slate-200">${ev.nombre_evento}</p><p class="text-[10px] text-slate-500 uppercase italic font-medium">${ev.fecha}</p></div>
-                    <button onclick="abrirEditor(${ev.id}, '${ev.nombre_evento}', '${ev.fecha}')" class="opacity-0 group-hover:opacity-100 transition-opacity text-purple-400 hover:text-white p-2">
-                        <i class="fas fa-edit text-lg"></i>
-                    </button>
-                </div>
-              `);
+                <div class="glass-card p-4 rounded-lg border-l-4 ${border} flex justify-between items-center group transition-all hover:bg-white/5">
+                    <div><p class="font-bold text-slate-200">${ev.nombre_evento}</p><p class="text-[10px] text-slate-500 uppercase italic font-medium">${ev.fecha}</p></div>
+                    <button onclick="abrirEditor(${ev.id}, '${ev.nombre_evento}', '${ev.fecha}')" class="opacity-0 group-hover:opacity-100 text-purple-400 p-2"><i class="fas fa-edit text-lg"></i></button>
+                </div>`);
             });
           });
         }
@@ -303,25 +233,41 @@
             rolesBase = roles;
             $.get(rutaApi + "get_miembros.php", function (miembros) {
               miembrosBase = miembros;
-              const htmlSelects = rolesBase
-                .map(
-                  (rol) => `
-                <div class="flex flex-col">
-                    <label class="text-[10px] text-slate-400 uppercase font-bold mb-1">${rol.nombre_rol}</label>
-                    <select name="rol_${rol.id}" class="select-lineup w-full bg-slate-800 border-none rounded-lg p-2 text-sm text-slate-300">
-                        <option value="">-- Vacante --</option>
-                        ${miembrosBase.map((m) => `<option value="${m.id}">${m.nombre}</option>`).join("")}
-                    </select>
-                </div>`,
-                )
-                .join("");
-              $("#contenedor-lineup, #edit-contenedor-lineup").html(htmlSelects);
-              $("#edit-miembro-cambio").empty().append('<option value="">¿Quién faltó?</option>');
+              renderLineupForm("#contenedor-lineup");
+              renderLineupForm("#edit-contenedor-lineup");
               miembrosBase.forEach((m) =>
                 $("#edit-miembro-cambio").append(`<option value="${m.id}">${m.nombre}</option>`),
               );
             });
           });
+        }
+
+        // --- LÓGICA DE LINEUP (REVISADA) ---
+        function renderLineupForm(containerSelector) {
+          const html = rolesBase
+            .map((rol) => {
+              const nombreLower = rol.nombre_rol.toLowerCase();
+              let slots = 1;
+
+              // Verificamos de forma independiente cada rol
+              if (nombreLower.includes("director")) {
+                slots = 3;
+              } else if (nombreLower.includes("corista")) {
+                slots = 4;
+              }
+
+              let selects = "";
+              for (let i = 0; i < slots; i++) {
+                selects += `
+                <select name="rol_${rol.id}" class="select-lineup w-full bg-slate-800 border-none rounded-lg p-2 text-sm text-slate-300 mt-1">
+                  <option value="">-- ${rol.nombre_rol} ${slots > 1 ? i + 1 : ""} --</option>
+                  ${miembrosBase.map((m) => `<option value="${m.id}">${m.nombre}</option>`).join("")}
+                </select>`;
+              }
+              return `<div class="flex flex-col mb-3"><label class="text-[10px] text-slate-400 uppercase font-bold ml-1">${rol.nombre_rol}</label>${selects}</div>`;
+            })
+            .join("");
+          $(containerSelector).html(html);
         }
 
         function cargarDatalistCanciones() {
@@ -331,23 +277,6 @@
               .empty()
               .append(data.map((c) => `<option value="${c.titulo}">`));
           });
-        }
-
-        // --- LÓGICA SETLIST (GENÉRICA) ---
-        function manejarAgregado(inputSelector, listArray, renderCallback) {
-          const val = $(inputSelector).val().trim();
-          if (val === "") return;
-          const found = cancionesDB.find((c) => c.titulo.toLowerCase() === val.toLowerCase());
-          if (found) {
-            if (!listArray.find((s) => s.id === found.id)) {
-              listArray.push({ id: found.id, titulo: found.titulo, cantante_id: "", nota_tonalidad: "" });
-              renderCallback();
-            }
-          } else if (confirm("¿Agregar canción fuera de repertorio?")) {
-            listArray.push({ id: null, titulo: val, cantante_id: "", nota_tonalidad: "" });
-            renderCallback();
-          }
-          $(inputSelector).val("").focus();
         }
 
         function renderGenericSetlist(selector, listArray) {
@@ -360,14 +289,14 @@
             <li class="bg-white/5 p-3 rounded-lg border border-white/10 space-y-2">
                 <div class="flex justify-between items-center">
                     <span><b class="text-purple-500">${i + 1}.</b> ${s.titulo}</span>
-                    <button type="button" class="text-red-400 btn-remove" data-index="${i}"><i class="fas fa-times"></i></button>
+                    <button type="button" class="text-red-400" onclick="quitarCanGlobal('${selector}', ${i})"><i class="fas fa-times"></i></button>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
-                    <select class="sel-cantante bg-slate-800 text-[10px] rounded p-1 text-slate-300 border-none" data-index="${i}">
-                        <option value="">¿Quién canta?</option>
+                    <select onchange="updSetGlobal('${selector}', ${i}, 'cantante_id', this.value)" class="bg-slate-800 text-[10px] rounded p-1 text-slate-300 border-none">
+                        <option value="">¿Cantante?</option>
                         ${miembrosBase.map((m) => `<option value="${m.id}" ${s.cantante_id == m.id ? "selected" : ""}>${m.nombre}</option>`).join("")}
                     </select>
-                    <input type="text" placeholder="Nota" value="${s.nota_tonalidad || ""}" class="inp-nota bg-slate-800 text-[10px] rounded p-1 text-slate-300 border-none" data-index="${i}">
+                    <input type="text" placeholder="Nota" value="${s.nota_tonalidad || ""}" onchange="updSetGlobal('${selector}', ${i}, 'nota_tonalidad', this.value)" class="bg-slate-800 text-[10px] rounded p-1 text-slate-300 border-none">
                 </div>
             </li>`,
                 )
@@ -375,41 +304,33 @@
             );
         }
 
-        // Listeners Nuevo Evento
-        $("#btn-add-song").click(() =>
-          manejarAgregado("#search-song", setlistTemporal, () =>
-            renderGenericSetlist("#lista-setlist-nuevo", setlistTemporal),
-          ),
-        );
-        $("#lista-setlist-nuevo").on("click", ".btn-remove", function () {
-          setlistTemporal.splice($(this).data("index"), 1);
-          renderGenericSetlist("#lista-setlist-nuevo", setlistTemporal);
-        });
-        $("#lista-setlist-nuevo").on("change", ".sel-cantante", function () {
-          setlistTemporal[$(this).data("index")].cantante_id = $(this).val();
-        });
-        $("#lista-setlist-nuevo").on("change", ".inp-nota", function () {
-          setlistTemporal[$(this).data("index")].nota_tonalidad = $(this).val();
-        });
+        window.updSetGlobal = (sel, idx, field, val) => {
+          if (sel === "#lista-setlist-nuevo") setlistTemporal[idx][field] = val;
+          else setlistEdit[idx][field] = val;
+        };
 
-        // Listeners Modal Edición
-        $("#edit-btn-add-song").click(() =>
-          manejarAgregado("#edit-search-song", setlistEdit, () =>
-            renderGenericSetlist("#edit-lista-setlist", setlistEdit),
-          ),
-        );
-        $("#edit-lista-setlist").on("click", ".btn-remove", function () {
-          setlistEdit.splice($(this).data("index"), 1);
-          renderGenericSetlist("#edit-lista-setlist", setlistEdit);
-        });
-        $("#edit-lista-setlist").on("change", ".sel-cantante", function () {
-          setlistEdit[$(this).data("index")].cantante_id = $(this).val();
-        });
-        $("#edit-lista-setlist").on("change", ".inp-nota", function () {
-          setlistEdit[$(this).data("index")].nota_tonalidad = $(this).val();
-        });
+        window.quitarCanGlobal = (sel, idx) => {
+          if (sel === "#lista-setlist-nuevo") {
+            setlistTemporal.splice(idx, 1);
+            renderGenericSetlist(sel, setlistTemporal);
+          } else {
+            setlistEdit.splice(idx, 1);
+            renderGenericSetlist(sel, setlistEdit);
+          }
+        };
 
-        // --- LÓGICA DE EDICIÓN ---
+        $("#btn-add-song").click(() => addSong("#search-song", setlistTemporal, "#lista-setlist-nuevo"));
+        $("#edit-btn-add-song").click(() => addSong("#edit-search-song", setlistEdit, "#edit-lista-setlist"));
+
+        function addSong(input, array, list) {
+          const val = $(input).val().trim();
+          if (!val) return;
+          const found = cancionesDB.find((c) => c.titulo.toLowerCase() === val.toLowerCase());
+          array.push({ id: found ? found.id : null, titulo: val, cantante_id: "", nota_tonalidad: "" });
+          renderGenericSetlist(list, array);
+          $(input).val("").focus();
+        }
+
         window.abrirEditor = function (id, nom, fec) {
           $("#edit-ev-id").val(id);
           $("#edit-ev-nombre").val(nom);
@@ -417,14 +338,16 @@
           $("#edit-contenedor-lineup select").val("");
           $("#edit-nota-historico, #edit-miembro-cambio").val("");
 
-          // 1. Cargar Lineup
           $.get(rutaApi + "get_lineup_evento.php", { evento_id: id }, (lineup) => {
-            lineup.forEach((asig) =>
-              $(`#edit-contenedor-lineup select[name="rol_${asig.rol_id}"]`).val(asig.miembro_id),
-            );
+            const counters = {};
+            lineup.forEach((asig) => {
+              counters[asig.rol_id] = (counters[asig.rol_id] || 0) + 1;
+              $(`#edit-contenedor-lineup select[name="rol_${asig.rol_id}"]:eq(${counters[asig.rol_id] - 1})`).val(
+                asig.miembro_id,
+              );
+            });
           });
 
-          // 2. Cargar Setlist guardado
           $.get(rutaApi + "get_setlist_evento.php", { evento_id: id }, (setlist) => {
             setlistEdit = setlist.map((s) => ({
               id: s.cancion_id,
@@ -439,60 +362,33 @@
 
         $(".close-modal").on("click", () => $(".modal-overlay").fadeOut(200));
 
-        // SUBMIT EDICIÓN
-        $("#form-editar-evento").on("submit", function (e) {
+        $("#form-editar-evento, #form-nuevo-evento").on("submit", function (e) {
           e.preventDefault();
+          const isEdit = this.id === "form-editar-evento";
+          const container = isEdit ? "#edit-contenedor-lineup" : "#contenedor-lineup";
           let lineup = [];
-          $("#edit-contenedor-lineup .select-lineup").each(function () {
+          $(`${container} .select-lineup`).each(function () {
             if ($(this).val())
               lineup.push({ miembro_id: $(this).val(), rol_id: $(this).attr("name").replace("rol_", "") });
           });
 
           const payload = {
-            evento_id: $("#edit-ev-id").val(),
-            nombre: $("#edit-ev-nombre").val(),
-            fecha: $("#edit-ev-fecha").val(),
-            miembro_afectado: $("#edit-miembro-cambio").val(),
-            nota: $("#edit-nota-historico").val(),
+            evento_id: isEdit ? $("#edit-ev-id").val() : null,
+            nombre: isEdit ? $("#edit-ev-nombre").val() : $("#ev-nombre").val(),
+            fecha: isEdit ? $("#edit-ev-fecha").val() : $("#ev-fecha").val(),
+            miembro_afectado: isEdit ? $("#edit-miembro-cambio").val() : null,
+            nota: isEdit ? $("#edit-nota-historico").val() : null,
             lineup: lineup,
-            setlist: setlistEdit,
+            setlist: isEdit ? setlistEdit : setlistTemporal,
           };
 
           $.ajax({
-            url: rutaApi + "update_evento_completo.php",
+            url: rutaApi + (isEdit ? "update_evento_completo.php" : "save_evento_completo.php"),
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify(payload),
             success: () => {
-              $("#modal-editar-evento").fadeOut(200);
-              cargarCronograma();
-              alert("¡Actualizado!");
-            },
-          });
-        });
-
-        // SUBMIT NUEVO
-        $("#form-nuevo-evento").on("submit", function (e) {
-          e.preventDefault();
-          let lineup = [];
-          $("#contenedor-lineup .select-lineup").each(function () {
-            if ($(this).val())
-              lineup.push({ miembro_id: $(this).val(), rol_id: $(this).attr("name").replace("rol_", "") });
-          });
-          if (lineup.length === 0) return alert("Asigna al menos un músico.");
-
-          $.ajax({
-            url: rutaApi + "save_evento_completo.php",
-            type: "POST",
-            contentType: "application/json",
-            data: JSON.stringify({
-              nombre: $("#ev-nombre").val(),
-              fecha: $("#ev-fecha").val(),
-              lineup: lineup,
-              setlist: setlistTemporal,
-            }),
-            success: () => {
-              alert("¡Publicado!");
+              alert("¡Guardado!");
               location.reload();
             },
           });
