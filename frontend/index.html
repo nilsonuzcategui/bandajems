@@ -191,17 +191,35 @@
           // 4. Cargar Canciones
           $("#lista-canciones").empty();
           res.setlist.forEach((c, index) => {
+            // Validamos si existen los links para mostrar o no los botones
+            const youtubeBtn = c.url_youtube
+              ? `<a href="${c.url_youtube}" target="_blank" class="text-red-500 hover:text-red-400 text-lg transition-colors"><i class="fab fa-youtube"></i></a>`
+              : "";
+
+            const spotifyBtn = c.url_spotify
+              ? `<a href="${c.url_spotify}" target="_blank" class="text-green-500 hover:text-green-400 text-lg transition-colors"><i class="fab fa-spotify"></i></a>`
+              : "";
+
             $("#lista-canciones").append(`
-    <div class="flex items-center justify-between p-4 bg-white/5 rounded-lg mb-2">
-        <div class="flex items-center gap-3">
-            <img src="${c.foto_url || "https://via.placeholder.com/30"}" class="w-8 h-8 rounded-full border border-purple-500">
-            <div>
-                <p class="font-semibold text-sm">${c.titulo}</p>
-                <p class="text-[9px] text-slate-400 uppercase">${c.cantante || "Sin asignar"} • ${c.nota_tonalidad || "Original"}</p>
+        <div class="flex items-center justify-between p-4 bg-white/5 rounded-lg mb-2 hover:bg-white/10 transition-all">
+            <div class="flex items-center gap-3">
+                <img src="${c.foto_url || "https://via.placeholder.com/150?u=jems"}" 
+                     class="w-10 h-10 rounded-full border-2 border-purple-500 object-cover shadow-sm">
+                <div>
+                    <p class="font-semibold text-sm text-slate-200">${c.titulo}</p>
+                    <p class="text-[9px] text-slate-400 uppercase tracking-wider">
+                        <span class="text-purple-400 font-bold">${c.cantante || "Sin asignar"}</span> 
+                        • ${c.nota_tonalidad || "Original"}
+                    </p>
+                </div>
+            </div>
+            
+            <div class="flex gap-4 items-center">
+                ${youtubeBtn}
+                ${spotifyBtn}
             </div>
         </div>
-        </div>
-`);
+    `);
           });
         });
       });
