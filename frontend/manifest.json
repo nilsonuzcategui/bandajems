@@ -1,0 +1,17 @@
+{
+  "short_name": "JEMS Band",
+  "name": "JEMS Band - Control de Eventos",
+  "icons": [
+    {
+      "src": "https://banda.micasajems.com/images/logobandajems.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/index.html",
+  "display": "standalone",
+  "theme_color": "#1e1b4b",
+  "background_color": "#0f172a",
+  "orientation": "portrait"
+}
