@@ -12,6 +12,8 @@ $cancion = new Cancion($db);
 $stmt = $cancion->read();
 $num = $stmt->rowCount();
 
+// test
+
 if ($num > 0) {
     $canciones = array();
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
