@@ -1,0 +1,33 @@
+name: Deploy Frontend JEMS
+
+on:
+  push:
+    # Solo se activa cuando hay cambios en la rama main
+    branches:
+      - main
+    # FILTRO CRÍTICO: Solo se activa si cambias algo dentro de /frontend
+    paths:
+      - "frontend/**"
+
+jobs:
+  deploy:
+    name: FTP Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🚚 Get latest code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 📂 Sync Frontend to Server
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER_FRONT }}
+          username: ${{ secrets.FTP_USERNAME_FRONT }}
+          password: ${{ secrets.FTP_PASSWORD_FRONT }}
+          # Carpeta local que quieres subir
+          local-dir: ./frontend/
+          # Carpeta remota en tu hosting (ej: public_html/jems)
+          server-dir: ./public_html/
+          # Solo sube archivos nuevos o modificados
+          dangerous-clean-slate: false
