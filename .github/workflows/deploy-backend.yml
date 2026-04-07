@@ -1,0 +1,34 @@
+name: Deploy Backend JEMS (PHP)
+
+on:
+    push:
+        branches:
+            - main
+        # Se activa solo si cambias algo en el core del sistema PHP
+        paths:
+            - "backend/**"
+
+jobs:
+    deploy-php:
+        name: FTP PHP Deploy
+        runs-on: ubuntu-latest
+        steps:
+            - name: 🚚 Get latest code
+              uses: actions/checkout@v4
+
+            - name: 📂 Sync Backend to Server
+              uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+              with:
+                  server: ${{ secrets.FTP_SERVER_BACKEND }}
+                  username: ${{ secrets.FTP_USERNAME_BACKEND }}
+                  password: ${{ secrets.FTP_PASSWORD_BACKEND }}
+                  # Carpeta local a subir
+                  local-dir: ./backend/
+                  # Carpeta destino (donde vive tu API)
+                  server-dir: ./public_html/
+                  # EXCLUIR archivos sensibles y de desarrollo
+                  exclude: |
+                      **/.git*
+                      **/config/Database.php
+                      **/*.example
+                      **/node_modules/**
