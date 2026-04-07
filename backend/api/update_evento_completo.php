@@ -54,6 +54,26 @@ if (!empty($data->evento_id) && !empty($data->nombre)) {
             }
         }
 
+        // 2.5 Actualizar el Setlist en la Edición
+        $db->prepare("DELETE FROM evento_setlist WHERE evento_id = ?")->execute([$evento->id]);
+
+        if (!empty($data->setlist)) {
+            $querySet = "INSERT INTO evento_setlist (evento_id, cancion_id, orden, cantante_id, nota_tonalidad) 
+                 VALUES (?, ?, ?, ?, ?)";
+            $stmtSet = $db->prepare($querySet);
+            $ord = 1;
+            foreach ($data->setlist as $s) {
+                $stmtSet->execute([
+                    $evento->id,
+                    $s->id,
+                    $ord,
+                    $s->cantante_id ?? null,
+                    $s->nota_tonalidad ?? null
+                ]);
+                $ord++;
+            }
+        }
+
         // 3. Registrar en el Histórico si hay reporte de incidencia
         if (!empty($data->miembro_afectado) && !empty($data->nota)) {
             // Usamos el método que ya tienes en el modelo Evento

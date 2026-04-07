@@ -126,8 +126,8 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
       $(document).ready(function () {
-        // const rutaApi = "http://localhost/bandajems/backend/api/";
-        const rutaApi = "https://api.micasajems.com/api/";
+        const rutaApi = "http://localhost/bandajems/backend/api/";
+        // const rutaApi = "https://api.micasajems.com/api/";
 
         // Cargar evento de la semana siguiente
         $.get(rutaApi + "get_future_event.php", function (res) {
@@ -192,17 +192,16 @@
           $("#lista-canciones").empty();
           res.setlist.forEach((c, index) => {
             $("#lista-canciones").append(`
-                    <div class="flex items-center justify-between p-4 bg-white/5 rounded-lg mb-2 hover:bg-white/10 transition-colors">
-                        <div class="flex items-center gap-3">
-                            <span class="text-purple-500 font-bold text-lg">${String(index + 1).padStart(2, "0")}</span>
-                            <p class="font-semibold text-sm">${c.titulo}</p>
-                        </div>
-                        <div class="flex gap-3">
-                            <a href="${c.url_youtube}" target="_blank" class="text-red-500 text-lg"><i class="fab fa-youtube"></i></a>
-                            ${c.url_spotify ? `<a href="${c.url_spotify}" target="_blank" class="text-green-500 text-lg"><i class="fab fa-spotify"></i></a>` : ""}
-                        </div>
-                    </div>
-                `);
+    <div class="flex items-center justify-between p-4 bg-white/5 rounded-lg mb-2">
+        <div class="flex items-center gap-3">
+            <img src="${c.foto_url || "https://via.placeholder.com/30"}" class="w-8 h-8 rounded-full border border-purple-500">
+            <div>
+                <p class="font-semibold text-sm">${c.titulo}</p>
+                <p class="text-[9px] text-slate-400 uppercase">${c.cantante || "Sin asignar"} • ${c.nota_tonalidad || "Original"}</p>
+            </div>
+        </div>
+        </div>
+`);
           });
         });
       });

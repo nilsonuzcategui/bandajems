@@ -2,6 +2,12 @@
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 
+// Si la petición es de tipo OPTIONS (Preflight), respondemos 200 y salimos
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
+
 include_once __DIR__ . '/../config/Database.php';
 
 $database = new Database();
@@ -32,10 +38,12 @@ $stmtL->execute([$id]);
 $lineup = $stmtL->fetchAll(PDO::FETCH_ASSOC);
 
 // 3. Obtener Setlist (Canciones)
-$querySongs = "SELECT c.titulo, c.url_youtube, c.url_spotify 
+$querySongs = "SELECT c.titulo, c.url_youtube, c.url_spotify, es.nota_tonalidad, m.nombre as cantante, m.foto_url 
                FROM evento_setlist es
                JOIN canciones c ON es.cancion_id = c.id
-               WHERE es.evento_id = ? ORDER BY es.orden ASC";
+               LEFT JOIN miembros m ON es.cantante_id = m.id
+               WHERE es.evento_id = ? 
+               ORDER BY es.orden ASC";
 $stmtS = $db->prepare($querySongs);
 $stmtS->execute([$id]);
 $songs = $stmtS->fetchAll(PDO::FETCH_ASSOC);

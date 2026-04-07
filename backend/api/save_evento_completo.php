@@ -60,16 +60,26 @@ if (
 
         // 3. Insertar el Setlist (Canciones)
         if (!empty($data->setlist)) {
-            $querySetlist = "INSERT INTO evento_setlist (evento_id, cancion_id, orden) VALUES (:ev, :ca, :ord)";
+            // Actualizamos el INSERT para incluir los dos nuevos campos
+            $querySetlist = "INSERT INTO evento_setlist (evento_id, cancion_id, orden, cantante_id, nota_tonalidad) 
+                     VALUES (:ev, :ca, :ord, :can, :nota)";
             $stmtSetlist = $db->prepare($querySetlist);
 
             $orden = 1;
             foreach ($data->setlist as $s) {
-                // Solo insertamos si la canción tiene un ID de la base de datos
                 if (!empty($s->id)) {
                     $stmtSetlist->bindParam(":ev", $id_evento);
                     $stmtSetlist->bindParam(":ca", $s->id);
                     $stmtSetlist->bindParam(":ord", $orden);
+
+                    // Validamos que el cantante_id no venga vacío (null si no se seleccionó nadie)
+                    $cantante = (!empty($s->cantante_id)) ? $s->cantante_id : null;
+                    $stmtSetlist->bindParam(":can", $cantante);
+
+                    // Validamos la nota de tonalidad
+                    $nota = (!empty($s->nota_tonalidad)) ? $s->nota_tonalidad : null;
+                    $stmtSetlist->bindParam(":nota", $nota);
+
                     $stmtSetlist->execute();
                     $orden++;
                 }

@@ -106,6 +106,28 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="edit-contenedor-lineup"></div>
           </div>
 
+          <div class="bg-black/20 p-5 rounded-xl border border-white/5">
+            <h4 class="text-purple-300 font-bold text-sm mb-4 uppercase italic">Modificar Setlist</h4>
+            <div class="flex gap-2 mb-4 relative">
+              <input
+                type="text"
+                id="edit-search-song"
+                list="listado-canciones"
+                placeholder="Buscar canción..."
+                class="flex-1 bg-white/5 border border-white/10 rounded-lg p-2 text-sm outline-none"
+                autocomplete="off"
+              />
+              <button
+                type="button"
+                id="edit-btn-add-song"
+                class="bg-purple-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-purple-500"
+              >
+                AGREGAR
+              </button>
+            </div>
+            <ul id="edit-lista-setlist" class="space-y-2"></ul>
+          </div>
+
           <div class="bg-red-900/10 border border-red-500/20 p-4 rounded-xl">
             <h4 class="text-red-400 font-bold text-xs mb-3 uppercase tracking-widest">
               <i class="fas fa-history mr-2"></i>Registrar Incidencia (Histórico)
@@ -227,16 +249,14 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
       $(document).ready(function () {
-        // const rutaApi = "http://localhost/bandajems/backend/api/";
-        const rutaApi = "https://api.micasajems.com/api/";
+        const rutaApi = "http://localhost/bandajems/backend/api/";
 
-        // Estado Global
-        let miembrosBase = [];
-        let rolesBase = [];
-        let cancionesDB = [];
-        let setlistTemporal = [];
+        let miembrosBase = [],
+          rolesBase = [],
+          cancionesDB = [];
+        let setlistTemporal = []; // Para Nuevo Evento
+        let setlistEdit = []; // Para Edición de Evento
 
-        // 1. CARGA INICIAL
         cargarCronograma();
         cargarDatosMaestros();
         cargarDatalistCanciones();
@@ -252,31 +272,25 @@
             }
             data.forEach((ev) => {
               const hoy = new Date().toISOString().split("T")[0];
-              let border = "border-purple-500";
-              let badge = "";
-              let opacity = "opacity-100";
-
-              if (ev.fecha < hoy) {
-                opacity = "opacity-50";
-                border = "border-slate-600";
-              }
-              if (ev.fecha === hoy) {
-                border = "border-green-500 ring-2 ring-green-500/20";
-                badge = "<span class='text-[10px] text-green-400 font-bold block tracking-widest'>HOY</span>";
-              }
+              let border =
+                ev.fecha < hoy
+                  ? "border-slate-600"
+                  : ev.fecha === hoy
+                    ? "border-green-500 ring-2 ring-green-500/20"
+                    : "border-purple-500";
+              let badge =
+                ev.fecha === hoy
+                  ? "<span class='text-[10px] text-green-400 font-bold block tracking-widest'>HOY</span>"
+                  : "";
 
               $("#lista-cronograma").append(`
-                        <div class="glass-card p-4 rounded-lg border-l-4 ${border} ${opacity} flex justify-between items-center group transition-all hover:bg-white/5">
-                            <div>
-                                ${badge}
-                                <p class="font-bold text-slate-200">${ev.nombre_evento}</p>
-                                <p class="text-[10px] text-slate-500 uppercase italic font-medium">${ev.fecha}</p>
-                            </div>
-                            <button onclick="abrirEditor(${ev.id}, '${ev.nombre_evento}', '${ev.fecha}')" class="opacity-0 group-hover:opacity-100 transition-opacity text-purple-400 hover:text-white p-2">
-                                <i class="fas fa-edit text-lg"></i>
-                            </button>
-                        </div>
-                    `);
+                <div class="glass-card p-4 rounded-lg border-l-4 ${border} ${ev.fecha < hoy ? "opacity-50" : ""} flex justify-between items-center group transition-all hover:bg-white/5">
+                    <div>${badge}<p class="font-bold text-slate-200">${ev.nombre_evento}</p><p class="text-[10px] text-slate-500 uppercase italic font-medium">${ev.fecha}</p></div>
+                    <button onclick="abrirEditor(${ev.id}, '${ev.nombre_evento}', '${ev.fecha}')" class="opacity-0 group-hover:opacity-100 transition-opacity text-purple-400 hover:text-white p-2">
+                        <i class="fas fa-edit text-lg"></i>
+                    </button>
+                </div>
+              `);
             });
           });
         }
@@ -286,26 +300,19 @@
             rolesBase = roles;
             $.get(rutaApi + "get_miembros.php", function (miembros) {
               miembrosBase = miembros;
-
-              // Generar selects para Nuevo Evento y Modal de Edición
               const htmlSelects = rolesBase
                 .map(
                   (rol) => `
-                        <div class="flex flex-col">
-                            <label class="text-[10px] text-slate-400 uppercase font-bold mb-1">${rol.nombre_rol}</label>
-                            <select name="rol_${rol.id}" class="select-lineup w-full bg-slate-800 border-none rounded-lg p-2 text-sm text-slate-300 focus:ring-1 focus:ring-purple-500">
-                                <option value="">-- Vacante --</option>
-                                ${miembrosBase.map((m) => `<option value="${m.id}">${m.nombre}</option>`).join("")}
-                            </select>
-                        </div>
-                    `,
+                <div class="flex flex-col">
+                    <label class="text-[10px] text-slate-400 uppercase font-bold mb-1">${rol.nombre_rol}</label>
+                    <select name="rol_${rol.id}" class="select-lineup w-full bg-slate-800 border-none rounded-lg p-2 text-sm text-slate-300">
+                        <option value="">-- Vacante --</option>
+                        ${miembrosBase.map((m) => `<option value="${m.id}">${m.nombre}</option>`).join("")}
+                    </select>
+                </div>`,
                 )
                 .join("");
-
-              $("#contenedor-lineup").html(htmlSelects);
-              $("#edit-contenedor-lineup").html(htmlSelects);
-
-              // Llenar select de reporte de inasistencia (Histórico)
+              $("#contenedor-lineup, #edit-contenedor-lineup").html(htmlSelects);
               $("#edit-miembro-cambio").empty().append('<option value="">¿Quién faltó?</option>');
               miembrosBase.forEach((m) =>
                 $("#edit-miembro-cambio").append(`<option value="${m.id}">${m.nombre}</option>`),
@@ -323,119 +330,145 @@
           });
         }
 
-        // 2. BUSCADOR DE CANCIONES (SETLIST)
-        $("#btn-add-song").on("click", function () {
-          const val = $("#search-song").val().trim();
+        // --- LÓGICA SETLIST (GENÉRICA) ---
+        function manejarAgregado(inputSelector, listArray, renderCallback) {
+          const val = $(inputSelector).val().trim();
           if (val === "") return;
-
           const found = cancionesDB.find((c) => c.titulo.toLowerCase() === val.toLowerCase());
           if (found) {
-            if (!setlistTemporal.find((s) => s.id === found.id)) {
-              setlistTemporal.push({ id: found.id, titulo: found.titulo });
-              renderSetlist();
+            if (!listArray.find((s) => s.id === found.id)) {
+              listArray.push({ id: found.id, titulo: found.titulo, cantante_id: "", nota_tonalidad: "" });
+              renderCallback();
             }
-          } else {
-            if (confirm("La canción no está en el repertorio. ¿Agregar de todos modos?")) {
-              setlistTemporal.push({ id: null, titulo: val });
-              renderSetlist();
-            }
+          } else if (confirm("¿Agregar canción fuera de repertorio?")) {
+            listArray.push({ id: null, titulo: val, cantante_id: "", nota_tonalidad: "" });
+            renderCallback();
           }
-          $("#search-song").val("").focus();
-        });
+          $(inputSelector).val("").focus();
+        }
 
-        function renderSetlist() {
-          $("#lista-setlist-nuevo")
+        function renderGenericSetlist(selector, listArray) {
+          $(selector)
             .empty()
             .append(
-              setlistTemporal
+              listArray
                 .map(
                   (s, i) => `
-                <li class="flex justify-between items-center bg-white/5 p-2 rounded-lg text-sm border border-white/10">
-                    <span><b class="text-purple-500 mr-2">${i + 1}.</b> ${s.titulo}</span>
-                    <button type="button" onclick="quitarCancion('${s.id}', '${s.titulo}')" class="text-red-400 hover:text-red-300 transition-colors">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </li>
-            `,
+            <li class="bg-white/5 p-3 rounded-lg border border-white/10 space-y-2">
+                <div class="flex justify-between items-center">
+                    <span><b class="text-purple-500">${i + 1}.</b> ${s.titulo}</span>
+                    <button type="button" class="text-red-400 btn-remove" data-index="${i}"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <select class="sel-cantante bg-slate-800 text-[10px] rounded p-1 text-slate-300 border-none" data-index="${i}">
+                        <option value="">¿Quién canta?</option>
+                        ${miembrosBase.map((m) => `<option value="${m.id}" ${s.cantante_id == m.id ? "selected" : ""}>${m.nombre}</option>`).join("")}
+                    </select>
+                    <input type="text" placeholder="Nota" value="${s.nota_tonalidad || ""}" class="inp-nota bg-slate-800 text-[10px] rounded p-1 text-slate-300 border-none" data-index="${i}">
+                </div>
+            </li>`,
                 )
                 .join(""),
             );
         }
 
-        window.quitarCancion = function (id, tit) {
-          setlistTemporal = setlistTemporal.filter((s) => (id !== "null" ? s.id != id : s.titulo !== tit));
-          renderSetlist();
-        };
+        // Listeners Nuevo Evento
+        $("#btn-add-song").click(() =>
+          manejarAgregado("#search-song", setlistTemporal, () =>
+            renderGenericSetlist("#lista-setlist-nuevo", setlistTemporal),
+          ),
+        );
+        $("#lista-setlist-nuevo").on("click", ".btn-remove", function () {
+          setlistTemporal.splice($(this).data("index"), 1);
+          renderGenericSetlist("#lista-setlist-nuevo", setlistTemporal);
+        });
+        $("#lista-setlist-nuevo").on("change", ".sel-cantante", function () {
+          setlistTemporal[$(this).data("index")].cantante_id = $(this).val();
+        });
+        $("#lista-setlist-nuevo").on("change", ".inp-nota", function () {
+          setlistTemporal[$(this).data("index")].nota_tonalidad = $(this).val();
+        });
 
-        // 3. LÓGICA DE EDICIÓN (PRECARGA DE DATOS)
+        // Listeners Modal Edición
+        $("#edit-btn-add-song").click(() =>
+          manejarAgregado("#edit-search-song", setlistEdit, () =>
+            renderGenericSetlist("#edit-lista-setlist", setlistEdit),
+          ),
+        );
+        $("#edit-lista-setlist").on("click", ".btn-remove", function () {
+          setlistEdit.splice($(this).data("index"), 1);
+          renderGenericSetlist("#edit-lista-setlist", setlistEdit);
+        });
+        $("#edit-lista-setlist").on("change", ".sel-cantante", function () {
+          setlistEdit[$(this).data("index")].cantante_id = $(this).val();
+        });
+        $("#edit-lista-setlist").on("change", ".inp-nota", function () {
+          setlistEdit[$(this).data("index")].nota_tonalidad = $(this).val();
+        });
+
+        // --- LÓGICA DE EDICIÓN ---
         window.abrirEditor = function (id, nom, fec) {
-          // Limpiar campos previos
-          $("#modal-editar-evento select.select-lineup").val("");
-          $("#edit-nota-historico").val("");
-          $("#edit-miembro-cambio").val("");
-
-          // Cargar datos básicos
           $("#edit-ev-id").val(id);
           $("#edit-ev-nombre").val(nom);
           $("#edit-ev-fecha").val(fec);
+          $("#edit-contenedor-lineup select").val("");
+          $("#edit-nota-historico, #edit-miembro-cambio").val("");
 
-          // AJAX para traer el lineup actual del evento y autoseleccionar
-          $.get(rutaApi + "get_lineup_evento.php", { evento_id: id }, function (lineupActual) {
-            if (lineupActual && lineupActual.length > 0) {
-              lineupActual.forEach((asig) => {
-                $(`#edit-contenedor-lineup select[name="rol_${asig.rol_id}"]`).val(asig.miembro_id);
-              });
-            }
+          // 1. Cargar Lineup
+          $.get(rutaApi + "get_lineup_evento.php", { evento_id: id }, (lineup) => {
+            lineup.forEach((asig) =>
+              $(`#edit-contenedor-lineup select[name="rol_${asig.rol_id}"]`).val(asig.miembro_id),
+            );
+          });
+
+          // 2. Cargar Setlist guardado
+          $.get(rutaApi + "get_setlist_evento.php", { evento_id: id }, (setlist) => {
+            setlistEdit = setlist.map((s) => ({
+              id: s.cancion_id,
+              titulo: s.titulo,
+              cantante_id: s.cantante_id,
+              nota_tonalidad: s.nota_tonalidad,
+            }));
+            renderGenericSetlist("#edit-lista-setlist", setlistEdit);
             $("#modal-editar-evento").css("display", "flex").hide().fadeIn(200);
           });
         };
 
         $(".close-modal").on("click", () => $(".modal-overlay").fadeOut(200));
 
-        // 4. SUBMITS (NUEVO / EDITAR)
+        // SUBMIT EDICIÓN
         $("#form-editar-evento").on("submit", function (e) {
           e.preventDefault();
-          const btn = $(this).find('button[type="submit"]');
-          btn.prop("disabled", true).text("Guardando...");
-
-          let lineupEditado = [];
+          let lineup = [];
           $("#edit-contenedor-lineup .select-lineup").each(function () {
-            if ($(this).val()) {
-              lineupEditado.push({
-                miembro_id: $(this).val(),
-                rol_id: $(this).attr("name").replace("rol_", ""),
-              });
-            }
+            if ($(this).val())
+              lineup.push({ miembro_id: $(this).val(), rol_id: $(this).attr("name").replace("rol_", "") });
           });
 
-          // Armamos el objeto exactamente como lo espera el backend
           const payload = {
             evento_id: $("#edit-ev-id").val(),
             nombre: $("#edit-ev-nombre").val(),
             fecha: $("#edit-ev-fecha").val(),
             miembro_afectado: $("#edit-miembro-cambio").val(),
             nota: $("#edit-nota-historico").val(),
-            lineup: lineupEditado,
+            lineup: lineup,
+            setlist: setlistEdit,
           };
 
           $.ajax({
             url: rutaApi + "update_evento_completo.php",
             type: "POST",
-            contentType: "application/json", // IMPORTANTE: Enviamos JSON
-            data: JSON.stringify(payload), // Convertimos el objeto a string
-            success: function (res) {
+            contentType: "application/json",
+            data: JSON.stringify(payload),
+            success: () => {
               $("#modal-editar-evento").fadeOut(200);
               cargarCronograma();
-              alert("¡Actualizado con éxito!");
+              alert("¡Actualizado!");
             },
-            error: function (xhr) {
-              console.error(xhr.responseText);
-              alert("Error al actualizar.");
-            },
-            complete: () => btn.prop("disabled", false).text("ACTUALIZAR EVENTO Y LOG"),
           });
         });
 
+        // SUBMIT NUEVO
         $("#form-nuevo-evento").on("submit", function (e) {
           e.preventDefault();
           let lineup = [];
@@ -443,22 +476,19 @@
             if ($(this).val())
               lineup.push({ miembro_id: $(this).val(), rol_id: $(this).attr("name").replace("rol_", "") });
           });
-
           if (lineup.length === 0) return alert("Asigna al menos un músico.");
-
-          const payload = {
-            nombre: $("#ev-nombre").val(),
-            fecha: $("#ev-fecha").val(),
-            lineup: lineup,
-            setlist: setlistTemporal,
-          };
 
           $.ajax({
             url: rutaApi + "save_evento_completo.php",
             type: "POST",
             contentType: "application/json",
-            data: JSON.stringify(payload),
-            success: function () {
+            data: JSON.stringify({
+              nombre: $("#ev-nombre").val(),
+              fecha: $("#ev-fecha").val(),
+              lineup: lineup,
+              setlist: setlistTemporal,
+            }),
+            success: () => {
               alert("¡Publicado!");
               location.reload();
             },
