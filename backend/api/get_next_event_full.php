@@ -15,7 +15,7 @@ $db = $database->getConnection();
 
 // 1. Obtener el próximo evento (hoy o el más cercano a futuro)
 $queryEv = "SELECT * FROM eventos 
-WHERE fecha > CURDATE() 
+WHERE fecha >= CURDATE() 
 ORDER BY fecha ASC 
 LIMIT 1;";
 $stmtEv = $db->prepare($queryEv);
