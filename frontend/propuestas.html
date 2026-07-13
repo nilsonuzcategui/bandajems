@@ -243,6 +243,15 @@
           return `<a href="${url}" target="_blank" class="text-slate-400 hover:text-slate-200 text-lg transition-colors" title="Abrir enlace"><i class="fas fa-link"></i></a>`;
         }
 
+        function thumbYoutube(url) {
+          const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([^&\n?#]+)/);
+          if (!m) return "";
+          const id = m[1];
+          return `<a href="${url}" target="_blank" title="Ver en YouTube" class="shrink-0 block opacity-60 hover:opacity-100 transition-opacity">
+            <img src="https://img.youtube.com/vi/${id}/default.jpg" onerror="this.style.display='none'" class="w-12 h-9 object-cover rounded border border-white/10" alt="" />
+          </a>`;
+        }
+
         function cargarPropuestas() {
           $.ajax({
             url: rutaApi + "get_propuestas.php",
@@ -257,7 +266,8 @@
 
               response.forEach((p) => {
                 $("#contenedor-propuestas").append(`
-                  <div class="glass-card p-4 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3 hover:bg-white/5 transition-all">
+                  <div class="glass-card p-4 rounded-xl flex items-center justify-between gap-3 hover:bg-white/5 transition-all">
+                    ${thumbYoutube(p.url_referencia)}
                     <div class="flex-1 min-w-0">
                       <div class="flex items-center gap-2 mb-1 flex-wrap">
                         <h4 class="font-bold text-base text-purple-200 break-words">${p.nombre_cancion}</h4>
