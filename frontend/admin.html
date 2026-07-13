@@ -283,7 +283,7 @@
             cancionesDB = data;
             $("#listado-canciones")
               .empty()
-              .append(data.map((c) => `<option value="${c.titulo}">`));
+              .append(data.map((c) => `<option value="${c.titulo}" data-id="${c.id}">`));
           });
         }
 
@@ -333,8 +333,29 @@
         function addSong(input, array, list) {
           const val = $(input).val().trim();
           if (!val) return;
-          const found = cancionesDB.find((c) => c.titulo.toLowerCase() === val.toLowerCase());
-          array.push({ id: found ? found.id : null, titulo: val, cantante_id: "", nota_tonalidad: "" });
+
+          let found = cancionesDB.find((c) => c.titulo.toLowerCase() === val.toLowerCase());
+
+          if (!found) {
+            const matchedOption = Array.from(document.querySelectorAll("#listado-canciones option")).find(
+              (opt) => opt.value === val,
+            );
+            if (matchedOption && matchedOption.dataset.id) {
+              found = { id: matchedOption.dataset.id, titulo: matchedOption.value };
+            }
+          }
+
+          if (!found) {
+            found = cancionesDB.find((c) => c.titulo.trim().toLowerCase() === val.toLowerCase());
+          }
+
+          if (!found) {
+            alert("No se encontró la canción en el repertorio. Selecciónala del listado o usa el botón AGREGAR solo con títulos válidos.");
+            $(input).focus();
+            return;
+          }
+
+          array.push({ id: found.id, titulo: found.titulo, cantante_id: "", nota_tonalidad: "" });
           renderGenericSetlist(list, array);
           $(input).val("").focus();
         }
