@@ -153,7 +153,14 @@
         // Detección automática de entorno (Local vs Producción)
         const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
         const rutaApi = isLocal ? "http://localhost/bandajems/backend/api/" : "https://api.micasajems.com/api/";
+        const baseImagenes = isLocal ? `${window.location.origin}/bandajems/frontend` : window.location.origin;
         console.log(`🚀 Corriendo en modo: ${isLocal ? "Localhost" : "Producción"}`);
+
+        function resolverFotoUrl(fotoUrl) {
+          if (!fotoUrl) return "https://i.pravatar.cc/150?u=jems";
+          if (/^https?:\/\//i.test(fotoUrl)) return fotoUrl;
+          return `${baseImagenes}/${fotoUrl.replace(/^\/+/, "")}`;
+        }
 
         // Cargar evento de la semana siguiente
         $.get(rutaApi + "get_future_event.php", function (res) {
@@ -194,7 +201,7 @@
           res.lineup.forEach((m) => {
             $("#lista-musicos").append(`
                     <div class="glass-card p-4 rounded-xl flex flex-col items-center text-center hover:scale-105 transition-all">
-                        <img src="${m.foto_url || "https://i.pravatar.cc/150?u=" + m.nombre}" class="w-20 h-20 rounded-full border-2 border-purple-500 mb-3 object-cover shadow-lg shadow-purple-500/20" />
+                        <img src="${resolverFotoUrl(m.foto_url) || "https://i.pravatar.cc/150?u=" + m.nombre}" class="w-20 h-20 rounded-full border-2 border-purple-500 mb-3 object-cover shadow-lg shadow-purple-500/20" />
                         <span class="font-bold text-sm">${m.nombre}</span>
                         <span class="text-[10px] text-purple-300 uppercase tracking-widest">${m.nombre_rol}</span>
                     </div>
