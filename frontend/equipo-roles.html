@@ -205,7 +205,7 @@
 
         // Convierte la foto_url almacenada (puede ser absoluta o relativa) en una URL servible.
         function resolverFotoUrl(fotoUrl) {
-          if (!fotoUrl) return "https://i.pravatar.cc/150?u=jems";
+          if (!fotoUrl) return `${baseImagenes}/images/default-avatar.svg`;
           if (/^https?:\/\//i.test(fotoUrl)) return fotoUrl;
           return `${baseImagenes}/${fotoUrl.replace(/^\/+/, "")}`;
         }

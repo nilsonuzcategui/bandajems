@@ -157,7 +157,7 @@
         console.log(`🚀 Corriendo en modo: ${isLocal ? "Localhost" : "Producción"}`);
 
         function resolverFotoUrl(fotoUrl) {
-          if (!fotoUrl) return "https://i.pravatar.cc/150?u=jems";
+          if (!fotoUrl) return `${baseImagenes}/images/default-avatar.svg`;
           if (/^https?:\/\//i.test(fotoUrl)) return fotoUrl;
           return `${baseImagenes}/${fotoUrl.replace(/^\/+/, "")}`;
         }
