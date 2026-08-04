@@ -1,4 +1,5 @@
 <?php
+// Cabeceras se envían SIEMPRE antes de cualquier salida, incluso en errores fatales.
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
@@ -6,6 +7,12 @@ header("Access-Control-Allow-Headers: Content-Type");
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);
+    exit;
+}
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(["status" => "error", "message" => "Método no permitido."]);
     exit;
 }
 
@@ -73,17 +80,16 @@ if ($info === false) {
 
 $nombreUnico = 'm_' . date('Ymd_His') . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
 
-// Ruta física destino (carpeta pública de imágenes del frontend).
-// dirname(__DIR__, 2) = raíz del proyecto (bandajems/). Ajusta si tu hosting cambia la estructura.
-$directorioDestino = dirname(__DIR__, 2) . '/frontend/images/miembros/';
+// Carpeta de subida DENTRO del backend (funciona aunque el frontend esté en otro host).
+$directorioDestino = dirname(__DIR__) . '/uploads/miembros/';
 $directorioDestino = str_replace('\\', '/', $directorioDestino);
 
 if (!is_dir($directorioDestino)) {
-    if (!mkdir($directorioDestino, 0755, true) && !is_dir($directorioDestino)) {
+    if (!@mkdir($directorioDestino, 0755, true) && !is_dir($directorioDestino)) {
         http_response_code(500);
         echo json_encode([
             "status" => "error",
-            "message" => "No se pudo crear la carpeta de destino.",
+            "message" => "No se pudo crear la carpeta de destino en el backend.",
         ]);
         exit;
     }
@@ -91,22 +97,27 @@ if (!is_dir($directorioDestino)) {
 
 $rutaFinal = $directorioDestino . $nombreUnico;
 
-if (!move_uploaded_file($file['tmp_name'], $rutaFinal)) {
+if (!@move_uploaded_file($file['tmp_name'], $rutaFinal)) {
     http_response_code(500);
     echo json_encode([
         "status" => "error",
-        "message" => "No se pudo guardar el archivo en el servidor.",
+        "message" => "No se pudo guardar el archivo. Verifica permisos de escritura.",
     ]);
     exit;
 }
 
 @chmod($rutaFinal, 0644);
 
-// Ruta relativa servida por el frontend (funciona en local y producción).
-$urlPublica = 'images/miembros/' . $nombreUnico;
+// URL ABSOLUTA servida por serve_image.php en el MISMO backend.
+// En producción será https://api.micasajems.com/api/serve_image.php?f=...
+// En local será http://localhost/bandajems/backend/api/serve_image.php?f=...
+$esquema = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+$host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+$urlPublica = $esquema . '://' . $host . '/api/serve_image.php?f=' . urlencode($nombreUnico);
 
 echo json_encode([
     "status" => "success",
     "url" => $urlPublica,
+    "filename" => $nombreUnico,
     "message" => "Imagen subida correctamente.",
 ]);
