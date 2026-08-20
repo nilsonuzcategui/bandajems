@@ -10,7 +10,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 }
 
 include_once __DIR__ . '/../config/Database.php';
+include_once __DIR__ . '/../config/Onesignal.php';
 include_once __DIR__ . '/../models/Actividad.php';
+include_once __DIR__ . '/OneSignalHelper.php';
 
 $database = new Database();
 $db = $database->getConnection();
@@ -41,11 +43,29 @@ try {
         throw new Exception("No se pudo registrar la actividad.");
     }
 
+    $pushResult = null;
+    if ($actividad->estado !== "cancelada") {
+        $categoriaLabel = ucfirst($actividad->categoria);
+        $title = "📅 " . $actividad->titulo;
+        $bodyParts = [];
+        if (!empty($actividad->hora_inicio)) {
+            $bodyParts[] = substr($actividad->hora_inicio, 0, 5);
+        }
+        if (!empty($actividad->lugar)) {
+            $bodyParts[] = $actividad->lugar;
+        }
+        $bodyParts[] = $categoriaLabel;
+        $body = implode(" • ", $bodyParts);
+
+        $pushResult = OneSignalHelper::sendPush($title, $body);
+    }
+
     http_response_code(201);
     echo json_encode([
         "status" => "success",
         "message" => "Actividad creada correctamente.",
         "id" => $id,
+        "push" => $pushResult,
     ]);
 } catch (Exception $e) {
     http_response_code(503);

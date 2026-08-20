@@ -139,7 +139,7 @@
 
           <div class="bg-purple-500/5 border border-purple-500/20 p-4 rounded-lg text-xs text-slate-400">
             <i class="fas fa-bell text-purple-400 mr-2"></i>
-            Esta actividad se guardará en la base de datos. El envío de la <b>notificación push</b> a los suscriptores se gestiona desde el panel principal de la iglesia (OneSignal), no desde aquí.
+            Al guardar, se enviará automáticamente una <b>notificación push</b> a todos los suscriptores suscritos en la web principal (vía OneSignal). El envío no se realiza si la actividad queda como <i>cancelada</i>.
           </div>
 
           <div class="flex gap-4 pt-2">
@@ -412,7 +412,10 @@
             success: function (res) {
               if (res.status === "success") {
                 $("#modal-actividad").fadeOut(200);
-                mostrarToast("Actividad guardada.");
+                const msgPush = res.push
+                  ? (res.push.success ? " 🔔 Push enviado" : (res.push.message ? " ⚠️ Push: " + res.push.message : ""))
+                  : "";
+                mostrarToast("Actividad guardada." + msgPush, false, !res.push || !res.push.success);
                 cargar();
               } else {
                 mostrarToast(res.message || "Error al guardar", true);
