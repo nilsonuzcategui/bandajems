@@ -10,9 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 }
 
 include_once __DIR__ . '/../config/Database.php';
-include_once __DIR__ . '/../config/Onesignal.php';
 include_once __DIR__ . '/../models/Actividad.php';
-include_once __DIR__ . '/OneSignalHelper.php';
 
 $database = new Database();
 $db = $database->getConnection();
@@ -45,29 +43,9 @@ $actividad->destacado = !empty($data->destacado) ? 1 : 0;
 $actividad->estado = !empty($data->estado) ? $data->estado : "programada";
 
 if ($actividad->update()) {
-    // Solo enviamos push cuando la actividad NO estaba cancelada y se reactiva/cambia
-    // (o se acaba de crear con destacado). Aquí notificamos siempre que no esté cancelada.
-    $pushResult = null;
-    if ($actividad->estado !== "cancelada") {
-        $categoriaLabel = ucfirst($actividad->categoria);
-        $title = "🔔 " . $actividad->titulo;
-        $bodyParts = ["Actualización"];
-        if (!empty($actividad->hora_inicio)) {
-            $bodyParts[] = substr($actividad->hora_inicio, 0, 5);
-        }
-        if (!empty($actividad->lugar)) {
-            $bodyParts[] = $actividad->lugar;
-        }
-        $bodyParts[] = $categoriaLabel;
-        $body = implode(" • ", $bodyParts);
-
-        $pushResult = OneSignalHelper::sendPush($title, $body);
-    }
-
     echo json_encode([
         "status" => "success",
         "message" => "Actividad actualizada.",
-        "push" => $pushResult,
     ]);
 } else {
     http_response_code(503);
