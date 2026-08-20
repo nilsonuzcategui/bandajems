@@ -1,6 +1,8 @@
 # Ignorar configuración de BD
 backend/config/Database.php
-backend/config/Sendpulse.php
+
+# Ignorar credenciales reales de OneSignal (push notifications)
+backend/config/Onesignal.php
 
 # Ignorar archivos temporales de editores
 .vscode/

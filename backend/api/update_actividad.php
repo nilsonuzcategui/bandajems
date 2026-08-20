@@ -10,9 +10,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 }
 
 include_once __DIR__ . '/../config/Database.php';
-include_once __DIR__ . '/../config/Sendpulse.php';
+include_once __DIR__ . '/../config/Onesignal.php';
 include_once __DIR__ . '/../models/Actividad.php';
-include_once __DIR__ . '/SendpulseHelper.php';
+include_once __DIR__ . '/OneSignalHelper.php';
 
 $database = new Database();
 $db = $database->getConnection();
@@ -61,7 +61,7 @@ if ($actividad->update()) {
         $bodyParts[] = $categoriaLabel;
         $body = implode(" • ", $bodyParts);
 
-        $pushResult = SendpulseHelper::sendPush($title, $body);
+        $pushResult = OneSignalHelper::sendPush($title, $body);
     }
 
     echo json_encode([

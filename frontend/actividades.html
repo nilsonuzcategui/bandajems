@@ -463,6 +463,19 @@
       });
     </script>
 
+    <!-- OneSignal Web Push SDK -->
+    <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async></script>
+    <script>
+      window.OneSignal = window.OneSignal || [];
+      OneSignal.push(function () {
+        OneSignal.init({
+          appId: "TU_APP_ID_AQUI",
+          serviceWorkerParam: { scope: "/" },
+          serviceWorkerPath: "OneSignalSDKWorker.js",
+        });
+      });
+    </script>
+
     <script>
       if ("serviceWorker" in navigator) {
         navigator.serviceWorker.register("sw.js");
