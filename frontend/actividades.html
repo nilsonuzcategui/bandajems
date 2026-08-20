@@ -117,6 +117,16 @@
         border-radius: 10px;
       }
     </style>
+
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script>
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+      OneSignalDeferred.push(async function (OneSignal) {
+        await OneSignal.init({
+          appId: "fee7a31e-e4ae-41e4-967d-e8ada00a6038",
+        });
+      });
+    </script>
   </head>
   <body class="purple-gradient min-h-screen text-slate-100">
     <!-- NAV estilo web oficial Iglesia JEMS -->
